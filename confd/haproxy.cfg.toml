@@ -1,0 +1,10 @@
+[template]
+src = "haproxy.cfg.tmpl"
+dest = "/opt/vamp/haproxy.cfg"
+owner = "root"
+mode = "0644"
+keys = [
+  "/vamp/gateways/haproxy/1.6",
+]
+
+reload_cmd ="/usr/bin/haproxy.sh restart"
