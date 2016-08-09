@@ -39,3 +39,6 @@ backend {{$s}}_backend
    mode http
 {{$backend_defined := 1}}{{end}}{{$exposed_port := getv (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.exposed_port" $stack_name $service_name)}}{{range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name)}}{{$ip := getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}
    server {{$s}}_{{$container}} {{$ip}}:{{$exposed_port}}{{end}}{{end}}{{end}}{{end}}
+
+listen default
+  bind *:42
