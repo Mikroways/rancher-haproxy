@@ -1,1 +1,41 @@
-{{getv "/vamp/gateways/haproxy/1.6"}}
+global
+        log 127.0.0.1 local0
+        log 127.0.0.1 local1 notice
+        maxconn 4096
+        maxpipes 1024
+        chroot /opt/vamp/chroot
+        user haproxy
+        group haproxy
+        daemon
+
+defaults
+        log     global
+        mode    tcp
+        option  tcplog
+        option  dontlognull
+        option  redispatch
+        option http-server-close
+        option forwardfor
+        retries 3
+        timeout connect 5000
+        timeout client 50000
+        timeout server 50000
+        errorfile 400 /opt/vamp/errorfiles/400.http
+        errorfile 403 /opt/vamp/errorfiles/403.http
+        errorfile 408 /opt/vamp/errorfiles/408.http
+        errorfile 500 /opt/vamp/errorfiles/500.http
+        errorfile 502 /opt/vamp/errorfiles/502.http
+        errorfile 503 /opt/vamp/errorfiles/503.http
+        errorfile 504 /opt/vamp/errorfiles/504.http
+frontend 1
+        bind *:80
+        mode http
+{{range $s, $stack_name := ls "/stacks"}}{{range $i, $service_name := ls (printf "/stacks/%s/services" $stack_name)}}{{if exists (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.exposed_port" $stack_name $service_name)}}{{$exposed_port := getv (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.exposed_port" $stack_name $service_name)}}{{if exists (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.server_names" $stack_name $service_name)}}{{$service_names := split ( getv (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.server_names" $stack_name $service_name ) ) "," }}{{range $s_n, $name := $service_names }}
+        acl {{$s}}_host hdr(host) -i {{$name}}{{end}}
+        use_backend {{$s}}_backend if {{$s}}_host {{end}}{{end}}{{end}}{{end}}
+
+{{range $s, $stack_name := ls "/stacks"}}{{range $i, $service_name := ls (printf "/stacks/%s/services" $stack_name)}}{{ $backend_defined := 0 }}{{if exists (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.exposed_port" $stack_name $service_name)}}{{if eq $backend_defined 0}}
+backend {{$s}}_backend
+   mode http
+{{$backend_defined := 1}}{{end}}{{$exposed_port := getv (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.exposed_port" $stack_name $service_name)}}{{range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name)}}{{$ip := getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}
+   server {{$s}}_{{$container}} {{$ip}}:{{$exposed_port}}{{end}}{{end}}{{end}}{{end}}
