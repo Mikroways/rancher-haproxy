@@ -4,11 +4,11 @@ MAINTAINER Raul Sanchez <rawmind@gmail.com>
 ENV VAMP_HOME /opt/vamp
 # Install haproxy
 RUN set -ex && \
-    apk --update add iptables iproute2 libnl3-cli musl-dev linux-headers curl gcc pcre-dev make zlib-dev && \
+    apk --update add iptables iproute2 libnl3-cli musl-dev linux-headers curl gcc pcre-dev make zlib-dev openssl-dev && \
     mkdir /usr/src && \
     curl -fL http://www.haproxy.org/download/1.6/src/haproxy-1.6.7.tar.gz | tar xzf - -C /usr/src && \
     cd /usr/src/haproxy-1.6.7 && \
-    make TARGET=linux2628 USE_PCRE=1 USE_ZLIB=1 && \
+    make TARGET=linux2628 USE_PCRE=1 USE_ZLIB=1 USE_OPENSSL=1 && \
     make install-bin && \
     cd .. && \
     mkdir -p /opt/vamp/errorfiles && \
