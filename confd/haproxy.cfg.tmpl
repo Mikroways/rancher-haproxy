@@ -35,12 +35,12 @@ frontend 1
 
         acl {{$s}}_{{$s_n}}_host hdr(host) -i {{$name}}{{if exists (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.force_ssl.%s" $stack_name $service_name $name)}}
         redirect scheme https if !internal_req  {{$s}}_{{$s_n}}_host !{ ssl_fc }
-        use_backend {{$s}}_backend if internal_req {{$s}}_{{$s_n}}_host {{else}}
-        use_backend {{$s}}_backend if {{$s}}_{{$s_n}}_host{{end}}{{end}}{{end}}{{end}}{{end}}{{end}}
+        use_backend {{$s}}_{{$i}}_backend if internal_req {{$s}}_{{$s_n}}_host {{else}}
+        use_backend {{$s}}_{{$i}}_backend if {{$s}}_{{$s_n}}_host{{end}}{{end}}{{end}}{{end}}{{end}}{{end}}
 
 
 {{range $s, $stack_name := ls "/stacks"}}{{range $i, $service_name := ls (printf "/stacks/%s/services" $stack_name)}}{{ $backend_defined := 0 }}{{if exists (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.exposed_port" $stack_name $service_name)}}{{if eq $backend_defined 0}}
-backend {{$s}}_backend
+backend {{$s}}_{{$i}}_backend
    mode http
 {{$backend_defined := 1}}{{end}}{{$exposed_port := getv (printf "/stacks/%s/services/%s/labels/io.rancher_haproxy.exposed_port" $stack_name $service_name)}}{{range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name)}}{{$ip := getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}
    server {{$s}}_{{$container}} {{$ip}}:{{$exposed_port}}{{end}}{{end}}{{end}}{{end}}
