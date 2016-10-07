@@ -1,5 +1,5 @@
 FROM rawmind/rancher-base:0.0.2-1
-MAINTAINER Raul Sanchez <rawmind@gmail.com>
+MAINTAINER Christian Rodriguez <chrodriguez@gmail.com>
 
 ENV VAMP_HOME /opt/vamp
 # Install haproxy
