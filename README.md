@@ -44,7 +44,7 @@ lb:
     io.rancher.scheduler.global: 'true'
     io.rancher.container.pull_image: always
   tty: true
-  image: mikroways/rancher-haproxy:1.1.0
+  image: mikroways/rancher-haproxy:1.1.1
   stdin_open: true
 ssl:
   ports:
