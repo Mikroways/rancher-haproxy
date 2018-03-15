@@ -14,7 +14,9 @@ The idea is forked from https://github.com/rawmind0/rancher-vamp-haproxy
   * **io.rancher_haproxy.server_names**: dns domain names for this service. More
     than one DNS domain name must be separated with comma
   * **io.rancher_haproxy.force_ssl.<FQDN>:**: force specific domain to use ssl.
-    Set this label to **true**
+    Set this label to activate it
+  * **io.rancher_haproxy.ssl_verify_none:**: don’t check the validity of a server certificate.
+    Set this label to activate it
 
 ### Sample stack that will be proxied:
 
@@ -24,6 +26,7 @@ nginx:
     io.rancher_haproxy.exposed_port: 80
     io.rancher_haproxy.server_names: example.net,www.example.net
     io.rancher_haproxy.force_ssl.www.example.net: true
+    io.rancher_haproxy.ssl_verify_none: true
   image: nginx
 ```
 
@@ -31,6 +34,7 @@ The above example will configure a reverse proxy:
 
 * Accept connections to http://example.net and http://www.example.net
 * Connections on http://www.example.net will be redirected to use https
+* Won't check the validity of the forwarded server's certificate 
 
 ## Runing the load balancer
 
